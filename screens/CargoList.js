@@ -8,7 +8,6 @@ import {
   FlatList,
   Image,
 } from 'react-native';
-import {ThemeColors} from 'react-navigation';
 
 export default class CargoList extends Component {
   render() {

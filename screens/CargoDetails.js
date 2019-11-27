@@ -7,7 +7,6 @@ import {
   StyleSheet,
   Image,
 } from 'react-native';
-import {ThemeColors} from 'react-navigation';
 
 export default class CargoDetails extends React.Component {
   render() {
@@ -22,7 +21,7 @@ export default class CargoDetails extends React.Component {
             <View style={styles.position_gps}>
               <View style={styles.gps_1}>
                 <Text style={styles.item_number}>화물번호</Text>
-                <Text style={styles.item_time}>등록시간 2019-11-27 09:05</Text>
+                <Text style={styles.item_time}>등록시간 {this.state.date}</Text>
               </View>
               <View style={styles.gps_2}>
                 <Image source={require('../public/images/icPin.png')} />
@@ -125,6 +124,7 @@ export default class CargoDetails extends React.Component {
     var data = props.navigation.state.params.item;
     this.state = {
       id: data.id,
+      date: data.date,
       startpoint: data.startpoint,
       endpoint: data.endpoint,
       carweight: data.carweight,

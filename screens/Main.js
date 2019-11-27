@@ -15,55 +15,55 @@ export default class Main extends React.Component {
 
     return (
       <View style={styles.container}>
-        <View style={styles.containerTop}>
-          <Text style={styles.invalidName}>
-            <Text style={{fontSize: 18}}>
-              {this.state.userNM}
-              기사님,
+        <View style={styles.top_container}>
+          <View style={styles.top_info}>
+            <Text style={styles.info_1_font}>
+              {this.state.userNM}님,안녕하세요
             </Text>
-            환영합니다
-          </Text>
-          <Text style={styles.walletStyle}>{this.state.userBalance}</Text>
-          <Text>보유하고 계십니다.</Text>
+            <Text style={styles.info_2_font}>{this.state.userBalance}TRC</Text>
+            <Text style={styles.info_3_font}>보유하고 계십니다</Text>
+          </View>
+          <View style={styles.top_image}>
+            <Text>이미지 있니?</Text>
+          </View>
         </View>
-        <View style={styles.containerBottom}>
-          <View style={styles.section1}>{this.displayJsx()}</View>
-          <View style={styles.section2}>
-            <TouchableOpacity
-              onPress={() =>
-                navigation.navigate('CargoSmart', {
-                  gpsdata: navigation.getParam('gpsdata'),
-                })
-              }
-              style={styles.buttonContainer}>
-              <Text style={styles.buttonText}>
+
+        <View style={styles.bottom_container}>
+          <View style={styles.bottom_top}>
+            {this.displayJsx()}
+
+            <View style={styles.smart}>
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate('CargoSmart', {
+                    gpsdata: navigation.getParam('gpsdata'),
+                  })
+                }
+                style={styles.buttonContainer}>
                 <Image source={require('../public/images/button2.png')} />
-              </Text>
-              <Text style={{top: 10, left: 50, color: '#444444'}}>
-                스마트 배차
-              </Text>
-            </TouchableOpacity>
+              </TouchableOpacity>
+            </View>
           </View>
-          <View style={styles.section3}>
-            <TouchableOpacity
-              onPress={() => navigation.navigate('Token')}
-              style={styles.buttonContainer}>
-              <Text style={styles.buttonText}>
+
+          <View style={styles.bottom_bottom}>
+            <View style={styles.token}>
+              <TouchableOpacity
+                onPress={() => this.props.navigation.navigate('Token')}
+                style={styles.buttonContainer}>
                 <Image source={require('../public/images/button3.png')} />
-              </Text>
-              <Text style={{top: 10, left: 50, color: '#444444'}}>
-                트러커 환전
-              </Text>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.section4}>
-            <TouchableOpacity
-              onPress={() => navigation.navigate('OrderList')}
-              style={styles.buttonContainer}>
-              <Text style={styles.buttonText}>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.history}>
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate('OrderList', {
+                    gpsdata: navigation.getParam('gpsdata'),
+                  })
+                }
+                style={styles.buttonContainer}>
                 <Image source={require('../public/images/button4.png')} />
-              </Text>
-            </TouchableOpacity>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </View>
@@ -72,36 +72,37 @@ export default class Main extends React.Component {
 
   displayJsx() {
     const navigation = this.props.navigation;
-
     if (this.state.readydata) {
       return (
-        <TouchableOpacity
-          onPress={() =>
-            navigation.navigate('CargoStart', {
-              gpsdata: navigation.getParam('gpsdata'),
-            })
-          }
-          style={styles.buttonContainer}>
-          <Text style={styles.buttonText}>운행 시작</Text>
-        </TouchableOpacity>
+        <View style={styles.itemlist}>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate('CargoStart', {
+                gpsdata: navigation.getParam('gpsdata'),
+              })
+            }
+            style={styles.buttonContainer}>
+            <Image source={require('../public/images/start.jpg')} />
+          </TouchableOpacity>
+        </View>
       );
-    } else if (this.state.readydata == false) {
+    } else {
       return (
-        <TouchableOpacity
-          onPress={() =>
-            navigation.navigate('CargoList', {
-              gpsdata: navigation.getParam('gpsdata'),
-            })
-          }
-          style={styles.buttonContainer}>
-          <Text style={styles.buttonText}>
+        <View style={styles.smart}>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate('CargoList', {
+                gpsdata: navigation.getParam('gpsdata'),
+              })
+            }
+            style={styles.buttonContainer}>
             <Image source={require('../public/images/button1.png')} />
-          </Text>
-          <Text style={{top: 10, left: 50, color: '#444444'}}>화물조회</Text>
-        </TouchableOpacity>
+          </TouchableOpacity>
+        </View>
       );
     }
   }
+
   constructor(props) {
     super(props);
     this.state = {};
@@ -135,15 +136,12 @@ export default class Main extends React.Component {
     );
     console.log(granted);
     if (granted) {
-      console.log('hi1');
       Geolocation.getCurrentPosition(
         position => {
-          console.log('hi');
           this.setState({
             lon: position.coords.longitude,
             lat: position.coords.latitude,
           });
-          console.log('hi');
           this.reverseGeo(this.state.lon, this.state.lat);
         },
         error => {
@@ -192,7 +190,6 @@ export default class Main extends React.Component {
   reverseGeo = async (lon, lat) => {
     const navigation = this.props.navigation;
     try {
-      console.log('reversegeo', lon, lat);
       let response = await fetch(
         `https://apis.openapi.sk.com/tmap/geo/reversegeocoding?version=1&lat=${lat}&lon=${lon}&coordType=WGS84GEO&&appKey=88bebbd6-8f99-4144-a656-46abd418bba8`,
         {
@@ -204,6 +201,8 @@ export default class Main extends React.Component {
         this.setState({fullAddr: json.addressInfo.fullAddress});
         navigation.setParams({
           gpsdata: json.addressInfo.fullAddress,
+          detailtitle: '상세 정보',
+          ordertitle: '배송 내역',
         });
       }
     } catch (err) {
@@ -233,7 +232,19 @@ export default class Main extends React.Component {
 }
 
 const styles = StyleSheet.create({
-  invalid: {
+  container: {
+    flex: 1,
+  },
+  top_container: {
+    flex: 1,
+    flexDirection: 'row',
+  },
+  top_info: {
+    flex: 2,
+    paddingHorizontal: 15,
+    paddingVertical: 30,
+  },
+  info_1_font: {
     fontFamily: 'AppleSDGothicNeo',
     fontSize: 15,
     fontWeight: 'normal',
@@ -241,41 +252,55 @@ const styles = StyleSheet.create({
     letterSpacing: 0,
     color: '#444444',
   },
-  walletStyle: {
+  info_2_font: {
     fontFamily: 'AppleSDGothicNeo',
     fontSize: 17,
-    fontWeight: '900',
+    fontWeight: '600',
     fontStyle: 'normal',
     letterSpacing: 0,
     color: '#5ab9cd',
   },
-  container: {
-    flex: 2,
+  info_3_font: {
+    fontFamily: 'AppleSDGothicNeo',
+    fontSize: 13,
+    fontWeight: 'normal',
+    fontStyle: 'normal',
+    letterSpacing: 0,
+    color: '#444444',
+  },
+  top_image: {
+    flex: 1,
+    paddingVertical: 50,
+    paddingHorizontal: 40,
+    alignItems: 'center',
+  },
+  bottom_container: {
+    flex: 4,
+    paddingVertical: 30,
+  },
+  bottom_top: {
+    flex: 1,
     flexDirection: 'row',
   },
-  containerTop: {
+  itemlist: {
     flex: 1,
-    left: 24,
-    top: 30,
+    alignItems: 'center',
   },
-  containerBottom: {
-    position: 'absolute',
+  smart: {
     flex: 1,
+    alignItems: 'center',
   },
-  section1: {
-    top: 60,
-    left: 30,
+  bottom_bottom: {
+    flex: 1,
+    flexDirection: 'row',
+    paddingBottom: 50,
   },
-  section2: {
-    top: -110,
-    left: 180,
+  token: {
+    flex: 1,
+    alignItems: 'center',
   },
-  section3: {
-    left: 30,
-    top: -110,
-  },
-  section4: {
-    left: 190,
-    top: -280,
+  history: {
+    flex: 1,
+    alignItems: 'center',
   },
 });
