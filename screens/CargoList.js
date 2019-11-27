@@ -47,7 +47,9 @@ export default class CargoList extends Component {
         <View style={styles.card_right}>
           <View style={styles.card_right_start_container}>
             <View style={styles.oval} />
-            <Text style={styles.card_right_start_font}>{item.saddr}</Text>
+            <Text style={styles.card_right_start_font}>
+              {item.saddr}({item.stoDistance}km)
+            </Text>
           </View>
           <View style={styles.card_right_center_1}>
             <View style={styles.dot} />
@@ -56,7 +58,9 @@ export default class CargoList extends Component {
             <View style={styles.dot} />
           </View>
           <View style={styles.card_right_end_container}>
-            <Text style={styles.card_right_end_font}>{item.eaddr}</Text>
+            <Text style={styles.card_right_end_font}>
+              {item.eaddr}({item.totalDistance}km)
+            </Text>
             <View style={styles.oval_2} />
             <View style={styles.dot_2} />
           </View>
@@ -68,7 +72,14 @@ export default class CargoList extends Component {
   componentDidMount() {
     this._getCargo();
   }
+
   _getCargo = async () => {
+    let gcs = [];
+    let gce = [];
+    let gcsaddr = [];
+    let gceaddr = [];
+    let AllData = [];
+
     try {
       const response = await fetch('http://localhost:3000/api/cargo', {
         method: 'GET',
@@ -78,11 +89,12 @@ export default class CargoList extends Component {
         },
       });
       const json = await response.json();
-      console.log(json);
+
       if (response.ok) {
         for (var i = 0; i < json.length; i++) {
           let substart = json[i].startpoint;
           let subend = json[i].endpoint;
+
           let sstart = substart.split(' ');
           let send = subend.split(' ');
 
@@ -91,11 +103,101 @@ export default class CargoList extends Component {
 
           json[i].saddr = startAddr;
           json[i].eaddr = endAddr;
+
+          gcs[i] = await this._getGeoCodingStart(substart);
+          gce[i] = await this._getGeoCodingEnd(subend);
+
+          gcsaddr[i] = await this._currentToStartTrace(
+            this.props.navigation.getParam('geodata').longitude,
+            this.props.navigation.getParam('geodata').latitude,
+            gcs[i].newLon,
+            gcs[i].newLat,
+          );
+
+          gceaddr[i] = await this._startToEndTrace(
+            gcs[i].newLon,
+            gcs[i].newLat,
+            gce[i].newLon,
+            gce[i].newLat,
+          );
+
+          let totaladdr = gcsaddr[i] + gceaddr[i];
+          json[i].totalDistance = Math.floor(totaladdr / 1000);
+          json[i].stoDistance = Math.floor(gcsaddr[i] / 1000);
         }
         this.setState({data: json});
       }
     } catch (err) {
       console.log(err);
+    }
+  };
+  _getGeoCodingStart = async data => {
+    try {
+      let response = await fetch(
+        `https://apis.openapi.sk.com/tmap/geo/fullAddrGeo?addressFlag=F00&coordType=WGS84GEO&version=1&format=json&fullAddr=${data}&appKey=88bebbd6-8f99-4144-a656-46abd418bba8`,
+        {
+          method: 'get',
+        },
+      );
+      let json = await response.json();
+      return json.coordinateInfo.coordinate[0];
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  _getGeoCodingEnd = async data => {
+    try {
+      let response = await fetch(
+        `https://apis.openapi.sk.com/tmap/geo/fullAddrGeo?addressFlag=F00&coordType=WGS84GEO&version=1&format=json&fullAddr=${data}&appKey=88bebbd6-8f99-4144-a656-46abd418bba8`,
+        {
+          method: 'get',
+        },
+      );
+      let json = await response.json();
+      return json.coordinateInfo.coordinate[0];
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  _currentToStartTrace = async (a, b, c, d) => {
+    let headers = {};
+    headers.appKey = '8cea5446-06f8-4412-bd63-a42e99290fad';
+    try {
+      let response = await fetch(
+        `https://apis.openapi.sk.com/tmap/routes?endX=${c}&endY=${d}&startX=${a}&startY=${b}&reqCoordType=WGS84GEO&resCoordType=WGS84GEO&searchOption =0&trafficInfo =N`,
+        {
+          method: 'post',
+          headers: headers,
+        },
+      );
+      let json = await response.json();
+      if (response.ok) {
+        return json.features[0].properties.totalDistance;
+      }
+    } catch (err) {
+      console.log('bad', err);
+    }
+  };
+
+  _startToEndTrace = async (a, b, c, d) => {
+    let headers = {};
+    headers.appKey = '8cea5446-06f8-4412-bd63-a42e99290fad';
+    try {
+      let response = await fetch(
+        `https://apis.openapi.sk.com/tmap/routes?endX=${c}&endY=${d}&startX=${a}&startY=${b}&reqCoordType=WGS84GEO&resCoordType=WGS84GEO&searchOption =0&trafficInfo =N`,
+        {
+          method: 'post',
+          headers: headers,
+        },
+      );
+      let json = await response.json();
+      if (response.ok) {
+        return json.features[0].properties.totalDistance;
+      }
+    } catch (err) {
+      console.log('bad', err);
     }
   };
 }

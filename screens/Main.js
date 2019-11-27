@@ -93,6 +93,7 @@ export default class Main extends React.Component {
             onPress={() =>
               navigation.navigate('CargoList', {
                 gpsdata: navigation.getParam('gpsdata'),
+                geodata: navigation.getParam('geodata'),
               })
             }
             style={styles.buttonContainer}>
@@ -131,10 +132,10 @@ export default class Main extends React.Component {
     }
   };
   componentDidMount() {
+    console.log('!!', this.props.navigation.getParam('data'));
     const granted = PermissionsAndroid.check(
       PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
     );
-    console.log(granted);
     if (granted) {
       Geolocation.getCurrentPosition(
         position => {
@@ -142,6 +143,7 @@ export default class Main extends React.Component {
             lon: position.coords.longitude,
             lat: position.coords.latitude,
           });
+          this.props.navigation.setParams({geodata: position.coords});
           this.reverseGeo(this.state.lon, this.state.lat);
         },
         error => {
@@ -191,7 +193,7 @@ export default class Main extends React.Component {
     const navigation = this.props.navigation;
     try {
       let response = await fetch(
-        `https://apis.openapi.sk.com/tmap/geo/reversegeocoding?version=1&lat=${lat}&lon=${lon}&coordType=WGS84GEO&&appKey=88bebbd6-8f99-4144-a656-46abd418bba8`,
+        `https://apis.openapi.sk.com/tmap/geo/reversegeocoding?version=1&lat=${lat}&lon=${lon}&coordType=WGS84GEO&&appKey=8cea5446-06f8-4412-bd63-a42e99290fad`,
         {
           method: 'get',
         },

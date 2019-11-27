@@ -89,7 +89,7 @@ export default class CargoDetails extends React.Component {
             <View style={styles.line} />
             <View style={styles.top_data_price}>
               <View style={styles.data_price_top}>
-                <Text style={styles.price_top_font}>여기다 뭐쓰냐</Text>
+                <Text style={styles.price_top_font}>{this.state.stoe}</Text>
               </View>
               <View style={styles.data_price_bottom}>
                 <View style={styles.price_text}>
@@ -124,6 +124,9 @@ export default class CargoDetails extends React.Component {
     var data = props.navigation.state.params.item;
     this.state = {
       id: data.id,
+      ctos: data.stoDistance,
+      ctoe: data.totalDistance,
+      stoe: data.totalDistance - data.stoDistance,
       date: data.date,
       startpoint: data.startpoint,
       endpoint: data.endpoint,

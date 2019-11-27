@@ -162,7 +162,10 @@ export default class Toekn extends React.Component {
   };
   constructor(props) {
     super(props);
-    this.state = {};
+    let data = props.navigation.state;
+    this.state = {
+      data: data,
+    };
   }
 
   componentDidMount() {
@@ -179,17 +182,18 @@ export default class Toekn extends React.Component {
         },
       });
       const json = await response.json();
-
+      console.log('!!!', json);
       if (response.ok) {
         this.setState({
-          id: json.id,
-          date: json.date,
-          startpoint: json.startpoint,
-          endpoint: json.endpoint,
-          carweight: json.carweight,
-          weight: json.weight,
-          transport: json.transport,
-          cost: json.cost,
+          id: json.data.id,
+          date: json.data.date,
+          startpoint: json.data.startpoint,
+          endpoint: json.data.endpoint,
+          carweight: json.data.carweight,
+          weight: json.data.weight,
+          transport: json.data.transport,
+          distance: json.distance.distance,
+          cost: json.data.cost,
         });
       }
     } catch (err) {
@@ -211,6 +215,7 @@ export default class Toekn extends React.Component {
           carweight: this.state.carweight,
           weight: this.state.weight,
           transport: this.state.transport,
+          distance: this.state.distance,
           cost: this.state.cost,
         }),
       });
