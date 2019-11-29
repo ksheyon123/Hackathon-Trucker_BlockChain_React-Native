@@ -71,21 +71,7 @@ export default class CargoList extends Component {
 
   componentDidMount() {
     this._getCargo();
-    this._testgetCargo();
   }
-
-  _testgetCargo = async () => {
-    try {
-      const response = await fetch('http://localhost:3000/api/testcargo', {
-        method: 'get',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-    } catch (err) {}
-  };
-
   _getCargo = async () => {
     let gcs = [];
     let gce = [];

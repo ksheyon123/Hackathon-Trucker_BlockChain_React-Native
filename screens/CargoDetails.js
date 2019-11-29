@@ -91,11 +91,16 @@ export default class CargoDetails extends React.Component {
             <View style={styles.line} />
             <View style={styles.top_data_price}>
               <View style={styles.data_price_top}>
-                <Text style={styles.price_top_font}>{this.state.stoe}</Text>
+                <Text style={styles.price_top_font}>{this.state.memo}</Text>
               </View>
               <View style={styles.data_price_bottom}>
                 <View style={styles.price_text}>
-                  <Text style={styles.price_text_font}>운송료</Text>
+                  <Text style={styles.price_text_font}>
+                    운송료
+                    <Text style={{color: '#44444', fontSize: 10}}>
+                      (평균 운송료 {this.state.avecost})
+                    </Text>
+                  </Text>
                 </View>
                 <View style={styles.price}>
                   <Text style={styles.price_font}>{this.state.cost}</Text>
@@ -135,9 +140,14 @@ export default class CargoDetails extends React.Component {
       carweight: data.carweight,
       weight: data.weight,
       transport: data.transport,
+      memo: data.memo,
       cost: data.cost,
     };
-    console.log(this.state);
+    // console.log(this.state);
+  }
+
+  componentDidMount() {
+    this._getAverage();
   }
 
   selectCargo = async () => {
@@ -163,6 +173,28 @@ export default class CargoDetails extends React.Component {
     } catch (err) {
       console.log(err);
     }
+  };
+
+  _getAverage = async () => {
+    try {
+      let a = this.state.startpoint;
+      let subst = a.split(' ');
+      console.log(subst[0]);
+      let response = await fetch('http://localhost:3000/getaverage', {
+        method: 'post',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({geodata: subst[0]}),
+      });
+      let json = await response.json();
+      console.log('getaver', json);
+      if (response.ok) {
+        let data = json.average * this.state.stoe;
+        this.setState({avecost: data});
+      }
+    } catch (err) {}
   };
 }
 

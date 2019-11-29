@@ -1,62 +1,73 @@
 import React from 'react';
 import {
   View,
+  Image,
   Text,
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  KeyboardAvoidingView,
 } from 'react-native';
 
 export default class Join extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-        <View style={styles.content}>
-          <Text style={styles.logo}> - NATIVE - </Text>
-
-          <View style={styles.inputContainer}>
+        <View style={styles.top}>
+          <Image
+            style={{left: 35, top: 45}}
+            source={require('../public/images/truck.jpg')}
+          />
+        </View>
+        <View style={styles.bottom}>
+          <View style={styles.input_1}>
+            <Text style={styles.title}>차주등록</Text>
+          </View>
+          <View style={styles.input_2}>
             <TextInput
-              underlineColorAndroid="transparent"
-              style={styles.input}
+              style={styles.data_input}
               onChangeText={phonenumber => this.setState({phonenumber})}
               value={this.state.phonenumber}
-              placeholder="phonenumber"
+              placeholderTextColor="white"
+              placeholder="핸드폰 번호"
             />
             <TextInput
+              style={styles.data_input}
               secureTextEntry={true}
-              underlineColorAndroid="transparent"
               onChangeText={password => this.setState({password})}
               value={this.state.password}
-              style={styles.input}
-              placeholder="password"
+              placeholderTextColor="white"
+              placeholder="비밀 번호"
             />
             <TextInput
-              underlineColorAndroid="transparent"
+              style={styles.data_input}
               onChangeText={username => this.setState({username})}
               value={this.state.username}
-              style={styles.input}
-              placeholder="username"
+              placeholderTextColor="white"
+              placeholder="이름"
             />
             <TextInput
-              underlineColorAndroid="transparent"
+              style={styles.data_input}
               onChangeText={carnumber => this.setState({carnumber})}
               value={this.state.carnumber}
-              style={styles.input}
-              placeholder="carnumber"
+              placeholderTextColor="white"
+              placeholder="차량 번호"
             />
             <TextInput
-              underlineColorAndroid="transparent"
+              style={styles.data_input}
               onChangeText={carweight => this.setState({carweight})}
               value={this.state.carweight}
-              style={styles.input}
-              placeholder="carweight"
+              placeholderTextColor="white"
+              placeholder="톤수"
             />
           </View>
-          <TouchableOpacity
-            onPress={this.register}
-            style={styles.buttonContainer}>
-            <Text style={styles.buttonText}>REGISTER</Text>
-          </TouchableOpacity>
+          <View style={styles.input_3}>
+            <View style={styles.register}>
+              <TouchableOpacity onPress={this.register}>
+                <Text style={styles.register_font}>차주 등록</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
       </View>
     );
@@ -75,6 +86,7 @@ export default class Join extends React.Component {
 
   register = async () => {
     try {
+      console.log('hi');
       const response = await fetch('http://localhost:3000/register', {
         method: 'post',
         headers: {
@@ -103,4 +115,65 @@ export default class Join extends React.Component {
   };
 }
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  top: {
+    flex: 1,
+    backgroundColor: 'white',
+  },
+  bottom: {
+    flex: 4,
+    backgroundColor: '#5ab9cd',
+  },
+  input_container: {
+    flex: 1,
+  },
+  input_1: {
+    flex: 1,
+  },
+  title: {
+    paddingVertical: 20,
+    textAlign: 'center',
+    fontFamily: 'AppleSDGothicNeo',
+    fontWeight: 'normal',
+    fontStyle: 'normal',
+    letterSpacing: 0,
+    color: 'white',
+    fontSize: 27,
+  },
+  input_2: {
+    paddingVertical: 10,
+    paddingHorizontal: 60,
+    flex: 4,
+  },
+  data_input: {
+    borderBottomWidth: 2,
+    borderColor: '#ffffff',
+    width: 250,
+    textAlign: 'center',
+    color: 'white',
+  },
+  input_3: {
+    flex: 2,
+  },
+  register: {
+    bottom: 20,
+    paddingTop: 15,
+    marginHorizontal: 100,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    left: 10,
+  },
+  register_font: {
+    textAlign: 'center',
+    fontFamily: 'AppleSDGothicNeo',
+    fontWeight: 'normal',
+    fontStyle: 'normal',
+    letterSpacing: 0,
+    fontSize: 15,
+    color: '#444444',
+    bottom: 10,
+  },
+});

@@ -165,7 +165,6 @@ export default class Main extends React.Component {
           });
           this.props.navigation.setParams({geodata: position.coords});
           this.reverseGeo(this.state.lon, this.state.lat);
-          console.log('geodata', this.props.navigation.getParam('geodata'));
         },
         error => {
           // See error code charts below.
