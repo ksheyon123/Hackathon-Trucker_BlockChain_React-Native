@@ -81,44 +81,24 @@ export default class OrderList extends React.Component {
         },
       });
       var json = await response.json();
-      console.log('api/list', json);
+      console.log('api/list', json.list[0]);
       if (response.ok) {
         if (json == false) {
           alert('운반한 화물이 없습니다');
-        } else if (!json[0]) {
-          let substart = json.startpoint;
-          let subend = json.endpoint;
-          let sstart = substart.split(' ');
-          let send = subend.split(' ');
-          let startAddr;
-          let endAddr;
-          for (var i = 0; i < sstart.length; i++) {
-            startAddr += sstart[i];
-            startAddr += ' ';
-          }
-          for (var i = 0; i < send.length; i++) {
-            endAddr += send[i];
-            endAddr += ' ';
-          }
-
-          json.saddr = startAddr;
-          json.eaddr = endAddr;
-
-          this.setState({data: json});
         } else {
-          for (var i = 0; i < json.length; i++) {
-            let substart = json[i].startpoint;
-            let subend = json[i].endpoint;
+          for (var i = 0; i < json.list.length; i++) {
+            let substart = json.list[i].startpoint;
+            let subend = json.list[i].endpoint;
             let sstart = substart.split(' ');
             let send = subend.split(' ');
 
             let startAddr = sstart[0] + ' ' + sstart[1] + ' ' + sstart[2];
             let endAddr = send[0] + ' ' + send[1] + ' ' + send[2];
 
-            json[i].saddr = startAddr;
-            json[i].eaddr = endAddr;
+            json.list[i].saddr = startAddr;
+            json.list[i].eaddr = endAddr;
           }
-          this.setState({data: json});
+          this.setState({data: json.list});
         }
       }
     } catch (err) {

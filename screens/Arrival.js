@@ -28,7 +28,7 @@ export default class Toekn extends React.Component {
         <View style={styles.container_top}>
           <View style={styles.top_position}>
             <View style={styles.position_title}>
-              <Text style={styles.title_font}> 화물 정보를 확인하세요!</Text>
+              <Text style={styles.title_font}> 화물을 인계하세요!</Text>
             </View>
             <View style={styles.line} />
             <View style={styles.position_gps}>
@@ -42,23 +42,16 @@ export default class Toekn extends React.Component {
                   {this.props.navigation.getParam('gpsdata')}
                 </Text>
               </View>
-              <View style={styles.dot_1} />
               <View style={styles.dot_2} />
-              <View style={styles.gps_3}>
-                <View style={styles.oval} />
-                <Text style={styles.start_gps_font}>
-                  {this.state.startpoint}({this.state.ctosDistance}km)
-                </Text>
-              </View>
+              {/* <View style={styles.gps_3} /> */}
               <View style={styles.dot_3} />
-              <View style={styles.dot_4} />
               <View style={styles.gps_4}>
                 <View style={styles.circle}>
                   <View style={styles.oval_2} />
                   <View style={styles.dot_big} />
                 </View>
                 <Text style={styles.end_gps}>
-                  {this.state.endpoint}({this.state.totalDistance}km)
+                  {this.state.endpoint}({this.state.ctoeDistance}km)
                 </Text>
               </View>
               <View style={styles.line_2} />
@@ -126,8 +119,8 @@ export default class Toekn extends React.Component {
           </View>
         </View>
         <View style={styles.container_bottom}>
-          <TouchableOpacity onPress={this.start}>
-            <Text style={styles.buttonText}>운행 시작</Text>
+          <TouchableOpacity onPress={this.arrival}>
+            <Text style={styles.buttonText}>배송 완료</Text>
           </TouchableOpacity>
         </View>
         <View>
@@ -146,25 +139,15 @@ export default class Toekn extends React.Component {
     );
   }
 
-  // constructor(props) {
-  //   super(props);
-  //   let data = props.navigation.state;
-
-  //   this.state = {
-  //     data: data,
-  //   };
-  //   console.log('data?', this.state);
-  // }
-
   signatureJsx() {
-    if (this.state.ctosDistance < 3) {
+    if (this.state.ctoeDistance < 3) {
       return (
         <TouchableOpacity onPress={this.showDialog}>
           <Image
             style={{left: 5}}
             source={require('../public/images/signature.png')}
           />
-          <Text style={{color: '#5ab9cd', fontWeight: '600'}}>출발지 서명</Text>
+          <Text style={{color: '#5ab9cd', fontWeight: '600'}}>도착지 서명</Text>
         </TouchableOpacity>
       );
     }
@@ -172,6 +155,7 @@ export default class Toekn extends React.Component {
 
   componentDidMount() {
     this._getReadyCargo();
+    console.log('componentDidMount', this.state);
   }
 
   _getReadyCargo = async () => {
@@ -205,25 +189,9 @@ export default class Toekn extends React.Component {
 
   _getCargoGeo = async data => {
     try {
-      let spoint = data.startpoint;
       let epoint = data.endpoint;
 
-      let gcs = await this._getGeoCodingStart(spoint);
       let gce = await this._getGeoCodingEnd(epoint);
-
-      let gcsaddr = await this._currentToStartTrace(
-        this.props.navigation.getParam('geodata').longitude,
-        this.props.navigation.getParam('geodata').latitude,
-        gcs.newLon,
-        gcs.newLat,
-      );
-
-      let gceaddr = await this._startToEndTrace(
-        gcs.newLon,
-        gcs.newLat,
-        gce.newLon,
-        gce.newLat,
-      );
 
       let caddr = await this._currentToEndTrace(
         this.props.navigation.getParam('geodata').longitude,
@@ -232,31 +200,11 @@ export default class Toekn extends React.Component {
         gce.newLat,
       );
 
-      let totaladdr = gcsaddr + gceaddr;
-      let totalDistance = Math.floor(totaladdr / 1000);
-      let ctosDistance = Math.floor(gcsaddr / 1000);
       let ctoeDistance = Math.floor(caddr / 1000);
-      console.log('totalDistance', totalDistance);
+
       this.setState({
-        totalDistance: totalDistance,
-        ctosDistance: ctosDistance,
         ctoeDistance: ctoeDistance,
       });
-    } catch (err) {
-      console.log(err);
-    }
-  };
-  //주소로 좌표 획득
-  _getGeoCodingStart = async data => {
-    try {
-      let response = await fetch(
-        `https://apis.openapi.sk.com/tmap/geo/fullAddrGeo?addressFlag=F00&coordType=WGS84GEO&version=1&format=json&fullAddr=${data}&appKey=88bebbd6-8f99-4144-a656-46abd418bba8`,
-        {
-          method: 'get',
-        },
-      );
-      let json = await response.json();
-      return json.coordinateInfo.coordinate[0];
     } catch (err) {
       console.log(err);
     }
@@ -275,46 +223,6 @@ export default class Toekn extends React.Component {
       return json.coordinateInfo.coordinate[0];
     } catch (err) {
       console.log(err);
-    }
-  };
-
-  _currentToStartTrace = async (a, b, c, d) => {
-    let headers = {};
-    headers.appKey = '8cea5446-06f8-4412-bd63-a42e99290fad';
-    try {
-      let response = await fetch(
-        `https://apis.openapi.sk.com/tmap/routes?endX=${c}&endY=${d}&startX=${a}&startY=${b}&reqCoordType=WGS84GEO&resCoordType=WGS84GEO&searchOption =0&trafficInfo =N`,
-        {
-          method: 'post',
-          headers: headers,
-        },
-      );
-      let json = await response.json();
-      if (response.ok) {
-        return json.features[0].properties.totalDistance;
-      }
-    } catch (err) {
-      console.log('bad', err);
-    }
-  };
-
-  _startToEndTrace = async (a, b, c, d) => {
-    let headers = {};
-    headers.appKey = '8cea5446-06f8-4412-bd63-a42e99290fad';
-    try {
-      let response = await fetch(
-        `https://apis.openapi.sk.com/tmap/routes?endX=${c}&endY=${d}&startX=${a}&startY=${b}&reqCoordType=WGS84GEO&resCoordType=WGS84GEO&searchOption =0&trafficInfo =N`,
-        {
-          method: 'post',
-          headers: headers,
-        },
-      );
-      let json = await response.json();
-      if (response.ok) {
-        return json.features[0].properties.totalDistance;
-      }
-    } catch (err) {
-      console.log('bad', err);
     }
   };
 
@@ -338,10 +246,10 @@ export default class Toekn extends React.Component {
     }
   };
 
-  start = async () => {
+  arrival = async () => {
     try {
       console.log('start', this.state);
-      let response = await fetch('http://localhost:3000/api/blockchaindata', {
+      let response = await fetch('http://localhost:3000/api/arrival', {
         method: 'post',
         headers: {
           'Content-Type': 'application/json',
@@ -353,15 +261,13 @@ export default class Toekn extends React.Component {
           carweight: this.state.carweight,
           weight: this.state.weight,
           transport: this.state.transport,
-          distance: this.state.totalDistance,
+          distance: this.state.ctoeDistance,
           cost: this.state.cost,
         }),
       });
       let json = await response.json();
       if (response.ok) {
-        this.props.navigation.navigate('Navigation', {
-          data: this.state,
-        });
+        this.props.navigation.navigate('MainDisplay');
       }
     } catch (err) {
       console.log(err);
@@ -462,7 +368,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   end_gps: {
-    bottom: 25,
+    bottom: 11,
     paddingHorizontal: 14,
     fontFamily: 'AppleSDGothicNeo',
     fontSize: 13,
@@ -636,7 +542,7 @@ const styles = StyleSheet.create({
   },
   oval_2: {
     left: 5,
-    bottom: 24,
+    bottom: 10,
     width: 17,
     height: 17,
     borderStyle: 'solid',
@@ -682,7 +588,7 @@ const styles = StyleSheet.create({
   },
   dot_big: {
     left: 8,
-    bottom: 38,
+    bottom: 24,
     width: 11,
     height: 11,
     borderStyle: 'solid',

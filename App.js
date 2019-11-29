@@ -17,6 +17,7 @@ import CargoDetailsScreens from './screens/CargoDetails';
 import OrderDetailsScreens from './screens/OrderDetails';
 import NavigationScreen from './screens/Navigation';
 import DrawerContent from './screens/DrawerContent';
+import ArrivalScreen from './screens/Arrival';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 
 const defaultNavigationOptions = ({navigation}) => {
@@ -97,6 +98,9 @@ const MainStack = createStackNavigator(
     },
     Navigation: {
       screen: NavigationScreen,
+    },
+    Arrival: {
+      screen: ArrivalScreen,
     },
   },
   {

@@ -37,6 +37,7 @@ export default class Main extends React.Component {
                 onPress={() =>
                   navigation.navigate('CargoSmart', {
                     gpsdata: navigation.getParam('gpsdata'),
+                    geodata: navigation.getParam('geodata'),
                   })
                 }
                 style={styles.buttonContainer}>
@@ -58,6 +59,7 @@ export default class Main extends React.Component {
                 onPress={() =>
                   navigation.navigate('OrderList', {
                     gpsdata: navigation.getParam('gpsdata'),
+                    geodata: navigation.getParam('geodata'),
                   })
                 }
                 style={styles.buttonContainer}>
@@ -72,13 +74,15 @@ export default class Main extends React.Component {
 
   displayJsx() {
     const navigation = this.props.navigation;
-    if (this.state.readydata) {
+    console.log('displayJsx', this.state.readydata);
+    if (this.state.readydata == '1') {
       return (
         <View style={styles.itemlist}>
           <TouchableOpacity
             onPress={() =>
               navigation.navigate('CargoStart', {
                 gpsdata: navigation.getParam('gpsdata'),
+                geodata: navigation.getParam('geodata'),
               })
             }
             style={styles.buttonContainer}>
@@ -86,7 +90,7 @@ export default class Main extends React.Component {
           </TouchableOpacity>
         </View>
       );
-    } else {
+    } else if (this.state.readydata == '0') {
       return (
         <View style={styles.smart}>
           <TouchableOpacity
@@ -98,6 +102,21 @@ export default class Main extends React.Component {
             }
             style={styles.buttonContainer}>
             <Image source={require('../public/images/button1.png')} />
+          </TouchableOpacity>
+        </View>
+      );
+    } else if (this.state.readydata == '2') {
+      return (
+        <View style={styles.smart}>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate('Arrival', {
+                gpsdata: navigation.getParam('gpsdata'),
+                geodata: navigation.getParam('geodata'),
+              })
+            }
+            style={styles.buttonContainer}>
+            <Image source={require('../public/images/arrival.png')} />
           </TouchableOpacity>
         </View>
       );
@@ -131,11 +150,12 @@ export default class Main extends React.Component {
       console.warn(err);
     }
   };
+
   componentDidMount() {
-    console.log('!!', this.props.navigation.getParam('data'));
     const granted = PermissionsAndroid.check(
       PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
     );
+
     if (granted) {
       Geolocation.getCurrentPosition(
         position => {
@@ -145,6 +165,7 @@ export default class Main extends React.Component {
           });
           this.props.navigation.setParams({geodata: position.coords});
           this.reverseGeo(this.state.lon, this.state.lat);
+          console.log('geodata', this.props.navigation.getParam('geodata'));
         },
         error => {
           // See error code charts below.
@@ -153,6 +174,7 @@ export default class Main extends React.Component {
         {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
       );
     }
+
     this._getSession();
     this.existReady();
     this.requestLocationPermission();
@@ -203,8 +225,6 @@ export default class Main extends React.Component {
         this.setState({fullAddr: json.addressInfo.fullAddress});
         navigation.setParams({
           gpsdata: json.addressInfo.fullAddress,
-          detailtitle: '상세 정보',
-          ordertitle: '배송 내역',
         });
       }
     } catch (err) {
@@ -222,9 +242,9 @@ export default class Main extends React.Component {
         },
       });
       const readydata = await response.json();
-
+      console.log('existReady', readydata);
       if (response.ok) {
-        this.setState({readydata: readydata});
+        this.setState({readydata: readydata.dkey});
       }
     } catch (err) {
       console.log('Err');

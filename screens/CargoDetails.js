@@ -34,7 +34,7 @@ export default class CargoDetails extends React.Component {
               <View style={styles.gps_3}>
                 <View style={styles.oval} />
                 <Text style={styles.start_gps_font}>
-                  {this.state.startpoint}
+                  {this.state.startpoint}({this.state.ctos}km)
                 </Text>
               </View>
               <View style={styles.dot_3} />
@@ -44,7 +44,9 @@ export default class CargoDetails extends React.Component {
                   <View style={styles.oval_2} />
                   <View style={styles.dot_big} />
                 </View>
-                <Text style={styles.end_gps}>{this.state.endpoint}</Text>
+                <Text style={styles.end_gps}>
+                  {this.state.endpoint}({this.state.stoe}km)
+                </Text>
               </View>
               <View style={styles.line_2} />
             </View>
@@ -135,6 +137,7 @@ export default class CargoDetails extends React.Component {
       transport: data.transport,
       cost: data.cost,
     };
+    console.log(this.state);
   }
 
   selectCargo = async () => {

@@ -45,7 +45,8 @@ export default class Navigation extends React.Component {
     );
   }
   moveTmapfromTrucker() {
-    console.log('moveTmapfromTrucker');
-    MoveTmap.moveTmapfromTrucker('rrr');
+    // console.log('moveTmapfromTrucker');
+    // MoveTmap.moveTmapfromTrucker('rrr');
+    this.props.navigation.navigate('MainInterCargo');
   }
 }
