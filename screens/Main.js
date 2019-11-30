@@ -6,64 +6,72 @@ import {
   TouchableOpacity,
   StyleSheet,
   Image,
+  Button,
 } from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
 
 export default class Main extends React.Component {
   render() {
     const navigation = this.props.navigation;
-
     return (
       <View style={styles.container}>
-        <View style={styles.containerTop}>
-          <Text style={styles.invalidName}>
-            <Text style={{fontSize: 18}}>
-              {this.state.userNM}
-              기사님,
+        <View style={styles.top_container}>
+          <View style={styles.top_info}>
+            <Text style={styles.info_1_font}>
+              {this.state.userNM}님,안녕하세요
             </Text>
-            환영합니다
-          </Text>
-          <Text style={styles.walletStyle}>{this.state.userBalance}</Text>
-          <Text>보유하고 계십니다.</Text>
+            <Text style={styles.info_2_font}>{this.state.userBalance}TRC</Text>
+            <Text style={styles.info_3_font}>보유하고 계십니다</Text>
+          </View>
+          <View style={styles.top_image}>
+            <Image source={require('../public/images/profile_1.png')} />
+          </View>
         </View>
-        <View style={styles.containerBottom}>
-          <View style={styles.section1}>{this.displayJsx()}</View>
-          <View style={styles.section2}>
-            <TouchableOpacity
-              onPress={() =>
-                navigation.navigate('CargoSmart', {
-                  gpsdata: navigation.getParam('gpsdata'),
-                })
-              }
-              style={styles.buttonContainer}>
-              <Text style={styles.buttonText}>
+
+        <View style={styles.bottom_container}>
+          <View style={styles.bottom_top}>
+            {this.displayJsx()}
+            <View style={styles.smart}>
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate('CargoSmart', {
+                    gpsdata: navigation.getParam('gpsdata'),
+                    geodata: navigation.getParam('geodata'),
+                  })
+                }
+                style={styles.buttonContainer}>
                 <Image source={require('../public/images/button2.png')} />
-              </Text>
-              <Text style={{top: 10, left: 50, color: '#444444'}}>
-                스마트 배차
-              </Text>
-            </TouchableOpacity>
+              </TouchableOpacity>
+            </View>
           </View>
-          <View style={styles.section3}>
-            <TouchableOpacity
-              onPress={() => navigation.navigate('Token')}
-              style={styles.buttonContainer}>
-              <Text style={styles.buttonText}>
+
+          <View style={styles.bottom_bottom}>
+            <View style={styles.token}>
+              <TouchableOpacity
+                onPress={() =>
+                  this.props.navigation.navigate('Token', {
+                    gpsdata: navigation.getParam('gpsdata'),
+                    geodata: navigation.getParam('geodata'),
+                    token: this.state.userBalance,
+                    name: this.state.userNM,
+                  })
+                }
+                style={styles.buttonContainer}>
                 <Image source={require('../public/images/button3.png')} />
-              </Text>
-              <Text style={{top: 10, left: 50, color: '#444444'}}>
-                트러커 환전
-              </Text>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.section4}>
-            <TouchableOpacity
-              onPress={() => navigation.navigate('OrderList')}
-              style={styles.buttonContainer}>
-              <Text style={styles.buttonText}>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.history}>
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate('OrderList', {
+                    gpsdata: navigation.getParam('gpsdata'),
+                    geodata: navigation.getParam('geodata'),
+                  })
+                }
+                style={styles.buttonContainer}>
                 <Image source={require('../public/images/button4.png')} />
-              </Text>
-            </TouchableOpacity>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </View>
@@ -72,36 +80,55 @@ export default class Main extends React.Component {
 
   displayJsx() {
     const navigation = this.props.navigation;
-
-    if (this.state.readydata) {
+    console.log('displayJsx', this.state.readydata);
+    if (this.state.readydata == '1') {
       return (
-        <TouchableOpacity
-          onPress={() =>
-            navigation.navigate('CargoStart', {
-              gpsdata: navigation.getParam('gpsdata'),
-            })
-          }
-          style={styles.buttonContainer}>
-          <Text style={styles.buttonText}>운행 시작</Text>
-        </TouchableOpacity>
+        <View style={styles.itemlist}>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate('CargoStart', {
+                gpsdata: navigation.getParam('gpsdata'),
+                geodata: navigation.getParam('geodata'),
+              })
+            }
+            style={styles.buttonContainer}>
+            <Image source={require('../public/images/start.jpg')} />
+          </TouchableOpacity>
+        </View>
       );
-    } else if (this.state.readydata == false) {
+    } else if (this.state.readydata == '0') {
       return (
-        <TouchableOpacity
-          onPress={() =>
-            navigation.navigate('CargoList', {
-              gpsdata: navigation.getParam('gpsdata'),
-            })
-          }
-          style={styles.buttonContainer}>
-          <Text style={styles.buttonText}>
+        <View style={styles.smart}>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate('CargoList', {
+                gpsdata: navigation.getParam('gpsdata'),
+                geodata: navigation.getParam('geodata'),
+              })
+            }
+            style={styles.buttonContainer}>
             <Image source={require('../public/images/button1.png')} />
-          </Text>
-          <Text style={{top: 10, left: 50, color: '#444444'}}>화물조회</Text>
-        </TouchableOpacity>
+          </TouchableOpacity>
+        </View>
+      );
+    } else if (this.state.readydata == '2') {
+      return (
+        <View style={styles.smart}>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate('Arrival', {
+                gpsdata: navigation.getParam('gpsdata'),
+                geodata: navigation.getParam('geodata'),
+              })
+            }
+            style={styles.buttonContainer}>
+            <Image source={require('../public/images/arrival.png')} />
+          </TouchableOpacity>
+        </View>
       );
     }
   }
+
   constructor(props) {
     super(props);
     this.state = {};
@@ -129,21 +156,20 @@ export default class Main extends React.Component {
       console.warn(err);
     }
   };
+
   componentDidMount() {
     const granted = PermissionsAndroid.check(
       PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
     );
-    console.log(granted);
+
     if (granted) {
-      console.log('hi1');
       Geolocation.getCurrentPosition(
         position => {
-          console.log('hi');
           this.setState({
             lon: position.coords.longitude,
             lat: position.coords.latitude,
           });
-          console.log('hi');
+          this.props.navigation.setParams({geodata: position.coords});
           this.reverseGeo(this.state.lon, this.state.lat);
         },
         error => {
@@ -153,6 +179,7 @@ export default class Main extends React.Component {
         {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
       );
     }
+
     this._getSession();
     this.existReady();
     this.requestLocationPermission();
@@ -192,9 +219,8 @@ export default class Main extends React.Component {
   reverseGeo = async (lon, lat) => {
     const navigation = this.props.navigation;
     try {
-      console.log('reversegeo', lon, lat);
       let response = await fetch(
-        `https://apis.openapi.sk.com/tmap/geo/reversegeocoding?version=1&lat=${lat}&lon=${lon}&coordType=WGS84GEO&&appKey=88bebbd6-8f99-4144-a656-46abd418bba8`,
+        `https://apis.openapi.sk.com/tmap/geo/reversegeocoding?version=1&lat=${lat}&lon=${lon}&coordType=WGS84GEO&&appKey=8cea5446-06f8-4412-bd63-a42e99290fad`,
         {
           method: 'get',
         },
@@ -205,6 +231,7 @@ export default class Main extends React.Component {
         navigation.setParams({
           gpsdata: json.addressInfo.fullAddress,
         });
+        console.log(this.state.fullAddr);
       }
     } catch (err) {
       console.log(err);
@@ -221,9 +248,9 @@ export default class Main extends React.Component {
         },
       });
       const readydata = await response.json();
-
+      console.log('existReady', readydata);
       if (response.ok) {
-        this.setState({readydata: readydata});
+        this.setState({readydata: readydata.dkey});
       }
     } catch (err) {
       console.log('Err');
@@ -233,7 +260,19 @@ export default class Main extends React.Component {
 }
 
 const styles = StyleSheet.create({
-  invalid: {
+  container: {
+    flex: 1,
+  },
+  top_container: {
+    flex: 1,
+    flexDirection: 'row',
+  },
+  top_info: {
+    flex: 2,
+    paddingHorizontal: 15,
+    paddingVertical: 30,
+  },
+  info_1_font: {
     fontFamily: 'AppleSDGothicNeo',
     fontSize: 15,
     fontWeight: 'normal',
@@ -241,41 +280,55 @@ const styles = StyleSheet.create({
     letterSpacing: 0,
     color: '#444444',
   },
-  walletStyle: {
+  info_2_font: {
     fontFamily: 'AppleSDGothicNeo',
     fontSize: 17,
-    fontWeight: '900',
+    fontWeight: '600',
     fontStyle: 'normal',
     letterSpacing: 0,
     color: '#5ab9cd',
   },
-  container: {
-    flex: 2,
+  info_3_font: {
+    fontFamily: 'AppleSDGothicNeo',
+    fontSize: 13,
+    fontWeight: 'normal',
+    fontStyle: 'normal',
+    letterSpacing: 0,
+    color: '#444444',
+  },
+  top_image: {
+    flex: 1,
+    paddingVertical: 50,
+    paddingHorizontal: 40,
+    alignItems: 'center',
+  },
+  bottom_container: {
+    flex: 4,
+    paddingVertical: 30,
+  },
+  bottom_top: {
+    flex: 1,
     flexDirection: 'row',
   },
-  containerTop: {
+  itemlist: {
     flex: 1,
-    left: 24,
-    top: 30,
+    alignItems: 'center',
   },
-  containerBottom: {
-    position: 'absolute',
+  smart: {
     flex: 1,
+    alignItems: 'center',
   },
-  section1: {
-    top: 60,
-    left: 30,
+  bottom_bottom: {
+    flex: 1,
+    flexDirection: 'row',
+    paddingBottom: 50,
   },
-  section2: {
-    top: -110,
-    left: 180,
+  token: {
+    flex: 1,
+    alignItems: 'center',
   },
-  section3: {
-    left: 30,
-    top: -110,
-  },
-  section4: {
-    left: 190,
-    top: -280,
+  history: {
+    flex: 1,
+    alignItems: 'center',
   },
 });

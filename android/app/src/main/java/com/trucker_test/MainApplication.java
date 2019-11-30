@@ -6,6 +6,7 @@ import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
 import com.swmansion.reanimated.ReanimatedPackage;
 import com.agontuk.RNFusedLocation.RNFusedLocationPackage;
+import com.reactnativecommunity.webview.RNCWebViewPackage;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
@@ -32,7 +33,8 @@ public class MainApplication extends Application implements ReactApplication {
             new RNGestureHandlerPackage(),
               new MapPackage(),
               new MoveTmapPackage(),
-              new RNFusedLocationPackage()
+              new RNFusedLocationPackage(),
+              new RNCWebViewPackage()
           );
         }
 

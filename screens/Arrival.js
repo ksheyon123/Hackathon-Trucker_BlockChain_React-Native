@@ -1,21 +1,34 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Image,
-} from 'react-native';
+import {View, Text, TouchableOpacity, StyleSheet, Image} from 'react-native';
+import SignaturePad from 'react-native-signature-pad';
+import Dialog from 'react-native-dialog';
 
-export default class CargoDetails extends React.Component {
+export default class Toekn extends React.Component {
+  state = {
+    dialogVisible: false,
+  };
+
+  showDialog = () => {
+    this.setState({dialogVisible: true});
+  };
+
+  handleCancel = () => {
+    this.setState({dialogVisible: false});
+  };
+
+  handleDelete = () => {
+    // The user has pressed the "Delete" button, so here you can do your own logic.
+    // ...Your logic
+    this.setState({dialogVisible: false});
+  };
+
   render() {
     return (
       <View style={styles.container}>
         <View style={styles.container_top}>
           <View style={styles.top_position}>
             <View style={styles.position_title}>
-              <Text style={styles.title_font}> 화물 정보를 확인하세요!</Text>
+              <Text style={styles.title_font}> 화물을 인계하세요!</Text>
             </View>
             <View style={styles.line} />
             <View style={styles.position_gps}>
@@ -29,23 +42,16 @@ export default class CargoDetails extends React.Component {
                   {this.props.navigation.getParam('gpsdata')}
                 </Text>
               </View>
-              <View style={styles.dot_1} />
               <View style={styles.dot_2} />
-              <View style={styles.gps_3}>
-                <View style={styles.oval} />
-                <Text style={styles.start_gps_font}>
-                  {this.state.startpoint}({this.state.ctos}km)
-                </Text>
-              </View>
+              {/* <View style={styles.gps_3} /> */}
               <View style={styles.dot_3} />
-              <View style={styles.dot_4} />
               <View style={styles.gps_4}>
                 <View style={styles.circle}>
                   <View style={styles.oval_2} />
                   <View style={styles.dot_big} />
                 </View>
                 <Text style={styles.end_gps}>
-                  {this.state.endpoint}({this.state.stoe}km)
+                  {this.state.endpoint}({this.state.ctoeDistance}km)
                 </Text>
               </View>
               <View style={styles.line_2} />
@@ -90,17 +96,11 @@ export default class CargoDetails extends React.Component {
             </View>
             <View style={styles.line} />
             <View style={styles.top_data_price}>
-              <View style={styles.data_price_top}>
-                <Text style={styles.price_top_font}>{this.state.memo}</Text>
-              </View>
+              <View style={styles.data_price_top} />
+              {this.signatureJsx()}
               <View style={styles.data_price_bottom}>
                 <View style={styles.price_text}>
-                  <Text style={styles.price_text_font}>
-                    운송료
-                    <Text style={{color: '#44444', fontSize: 10}}>
-                      (평균 운송료 {this.state.avecost})
-                    </Text>
-                  </Text>
+                  <Text style={styles.price_text_font}>운송료</Text>
                 </View>
                 <View style={styles.price}>
                   <Text style={styles.price_font}>{this.state.cost}</Text>
@@ -119,82 +119,159 @@ export default class CargoDetails extends React.Component {
           </View>
         </View>
         <View style={styles.container_bottom}>
-          <TouchableOpacity onPress={this.selectCargo}>
-            <Text style={styles.buttonText}>배차 신청</Text>
+          <TouchableOpacity onPress={this.arrival}>
+            <Text style={styles.buttonText}>배송 완료</Text>
           </TouchableOpacity>
+        </View>
+        <View>
+          <Dialog.Container visible={this.state.dialogVisible}>
+            <Dialog.Title>서명</Dialog.Title>
+            <SignaturePad
+              onError={this._signaturePadError}
+              onChange={this._signaturePadChange}
+              style={{flex: 1, backgroundColor: 'white'}}
+            />
+            <Dialog.Button label="확인" onPress={this.handleCancel} />
+            <Dialog.Button label="취소" onPress={this.handleDelete} />
+          </Dialog.Container>
         </View>
       </View>
     );
   }
-  constructor(props) {
-    super(props);
-    var data = props.navigation.state.params.item;
-    this.state = {
-      id: data.id,
-      ctos: data.stoDistance,
-      ctoe: data.totalDistance,
-      stoe: data.totalDistance - data.stoDistance,
-      date: data.date,
-      startpoint: data.startpoint,
-      endpoint: data.endpoint,
-      carweight: data.carweight,
-      weight: data.weight,
-      transport: data.transport,
-      memo: data.memo,
-      cost: data.cost,
-    };
-    // console.log(this.state);
+
+  signatureJsx() {
+    if (this.state.ctoeDistance < 3) {
+      return (
+        <TouchableOpacity onPress={this.showDialog}>
+          <Image
+            style={{left: 5}}
+            source={require('../public/images/signature.png')}
+          />
+          <Text style={{color: '#5ab9cd', fontWeight: '600'}}>도착지 서명</Text>
+        </TouchableOpacity>
+      );
+    }
   }
 
   componentDidMount() {
-    this._getAverage();
+    this._getReadyCargo();
+    console.log('componentDidMount', this.state);
   }
 
-  selectCargo = async () => {
+  _getReadyCargo = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/departure', {
-        method: 'POST',
+      const response = await fetch('http://localhost:3000/api/readycargo', {
+        method: 'GET',
+        credentials: 'include',
         headers: {
-          Accpet: 'application/json',
           'Content-Type': 'application/json',
         },
-        credentials: 'include',
-        body: JSON.stringify(this.state),
       });
       const json = await response.json();
       if (response.ok) {
-        // AsyncStorage.setItem(json.userID, JSON.stringify(session));
-        // AsyncStorage.getItem(json.userID, (err, result) => {
-        // });
-        this.props.navigation.replace('MainInterCargo');
-      } else {
-        alert('Plz Check Your ID & PW');
+        this.setState({
+          id: json.data.id,
+          date: json.data.date,
+          startpoint: json.data.startpoint,
+          endpoint: json.data.endpoint,
+          carweight: json.data.carweight,
+          weight: json.data.weight,
+          transport: json.data.transport,
+          cost: json.data.cost,
+        });
+
+        this._getCargoGeo(this.state);
       }
     } catch (err) {
       console.log(err);
     }
   };
 
-  _getAverage = async () => {
+  _getCargoGeo = async data => {
     try {
-      let a = this.state.startpoint;
-      let subst = a.split(' ');
-      console.log(subst[0]);
-      let response = await fetch('http://localhost:3000/getaverage', {
+      let epoint = data.endpoint;
+
+      let gce = await this._getGeoCodingEnd(epoint);
+
+      let caddr = await this._currentToEndTrace(
+        this.props.navigation.getParam('geodata').longitude,
+        this.props.navigation.getParam('geodata').latitude,
+        gce.newLon,
+        gce.newLat,
+      );
+
+      let ctoeDistance = Math.floor(caddr / 1000);
+
+      this.setState({
+        ctoeDistance: ctoeDistance,
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  _getGeoCodingEnd = async data => {
+    try {
+      let response = await fetch(
+        `https://apis.openapi.sk.com/tmap/geo/fullAddrGeo?addressFlag=F00&coordType=WGS84GEO&version=1&format=json&fullAddr=${data}&appKey=88bebbd6-8f99-4144-a656-46abd418bba8`,
+        {
+          method: 'get',
+        },
+      );
+      let json = await response.json();
+      console.log('_getGeoCodingEnd', json);
+      return json.coordinateInfo.coordinate[0];
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  _currentToEndTrace = async (a, b, c, d) => {
+    let headers = {};
+    headers.appKey = '8cea5446-06f8-4412-bd63-a42e99290fad';
+    try {
+      let response = await fetch(
+        `https://apis.openapi.sk.com/tmap/routes?endX=${c}&endY=${d}&startX=${a}&startY=${b}&reqCoordType=WGS84GEO&resCoordType=WGS84GEO&searchOption =0&trafficInfo =N`,
+        {
+          method: 'post',
+          headers: headers,
+        },
+      );
+      let json = await response.json();
+      if (response.ok) {
+        return json.features[0].properties.totalDistance;
+      }
+    } catch (err) {
+      console.log('bad', err);
+    }
+  };
+
+  arrival = async () => {
+    try {
+      console.log('start', this.state);
+      let response = await fetch('http://localhost:3000/api/arrival', {
         method: 'post',
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: 'include',
-        body: JSON.stringify({geodata: subst[0]}),
+        body: JSON.stringify({
+          id: this.state.id,
+          startpoint: this.state.startpoint,
+          endpoint: this.state.endpoint,
+          carweight: this.state.carweight,
+          weight: this.state.weight,
+          transport: this.state.transport,
+          distance: this.state.ctoeDistance,
+          cost: this.state.cost,
+        }),
       });
       let json = await response.json();
-      console.log('getaver', json);
       if (response.ok) {
-        let data = json.average * this.state.stoe;
-        this.setState({avecost: data});
+        this.props.navigation.replace('MainDisplay');
       }
-    } catch (err) {}
+    } catch (err) {
+      console.log(err);
+    }
   };
 }
 
@@ -291,7 +368,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   end_gps: {
-    bottom: 25,
+    bottom: 11,
     paddingHorizontal: 14,
     fontFamily: 'AppleSDGothicNeo',
     fontSize: 13,
@@ -364,6 +441,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 35,
   },
   data_price_top: {
+    top: 1,
     flex: 1,
     flexDirection: 'row',
   },
@@ -464,7 +542,7 @@ const styles = StyleSheet.create({
   },
   oval_2: {
     left: 5,
-    bottom: 24,
+    bottom: 10,
     width: 17,
     height: 17,
     borderStyle: 'solid',
@@ -510,7 +588,7 @@ const styles = StyleSheet.create({
   },
   dot_big: {
     left: 8,
-    bottom: 38,
+    bottom: 24,
     width: 11,
     height: 11,
     borderStyle: 'solid',

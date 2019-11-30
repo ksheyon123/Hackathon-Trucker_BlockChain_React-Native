@@ -33,9 +33,10 @@ export default class Home extends React.Component {
             <View style={styles.inputContainer}>
               <Image source={require('../public/images/icPhone.png')} />
               <TextInput
-                style={styles.input}
+                style={{color: '#ffffff'}}
                 onChangeText={phonenumber => this.setState({phonenumber})}
                 value={this.state.phonenumber}
+                placeholderTextColor="#ffffff"
                 placeholder="phonenumber"
               />
             </View>
@@ -45,7 +46,8 @@ export default class Home extends React.Component {
                 secureTextEntry={true}
                 onChangeText={password => this.setState({password})}
                 value={this.state.password}
-                style={styles.input}
+                style={{color: '#ffffff'}}
+                placeholderTextColor="#ffffff"
                 placeholder="password"
               />
             </View>

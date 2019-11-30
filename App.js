@@ -1,5 +1,5 @@
 import React from 'react';
-import {Button, Text, Image, View} from 'react-native';
+import {Text, Image, View} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {createAppContainer, createSwitchNavigator} from 'react-navigation';
 import {createStackNavigator} from 'react-navigation-stack';
@@ -16,17 +16,19 @@ import TokenScreen from './screens/Token';
 import CargoDetailsScreens from './screens/CargoDetails';
 import OrderDetailsScreens from './screens/OrderDetails';
 import NavigationScreen from './screens/Navigation';
-import {tsConstructorType} from '@babel/types';
 import DrawerContent from './screens/DrawerContent';
+import ArrivalScreen from './screens/Arrival';
+import {TouchableOpacity} from 'react-native-gesture-handler';
 
 const defaultNavigationOptions = ({navigation}) => {
-  console.log('defaultNavigationOptinos', navigation.state);
   return {
     headerTitle: (
-      <View style={{alignContent: 'center', color: '#ffffff'}}>
+      <View style={{alignContent: 'center'}}>
         <Text>
           <Image source={require('./public/images/icMap.png')} />
-          {navigation.getParam('gpsdata')}
+          <Text style={{color: '#ffffff'}}>
+            {navigation.getParam('gpsdata')}
+          </Text>
         </Text>
       </View>
     ),
@@ -38,13 +40,7 @@ const defaultNavigationOptions = ({navigation}) => {
       paddingHorizontal: 8,
       backgroundColor: '#5ab9cd',
     },
-    headerRight: (
-      <Button
-        style={{paddingLeft: 10}}
-        onPress={() => navigation.openDrawer()}
-        title="Hi"
-      />
-    ),
+    headerRight: <Image source={require('./public/images/icMenu.png')} />,
   };
 };
 
@@ -101,7 +97,10 @@ const MainStack = createStackNavigator(
     },
     Navigation: {
       screen: NavigationScreen,
-    }
+    },
+    Arrival: {
+      screen: ArrivalScreen,
+    },
   },
   {
     defaultNavigationOptions,
@@ -113,30 +112,6 @@ const AppDrawerNavigator = createDrawerNavigator(
     Main: {
       screen: MainStack,
     },
-    // CargoList: {
-    //   screen: createStackNavigator(
-    //     {Root: CargoDetailStack},
-    //     {defaultNavigationOptions},
-    //   ),
-    // },
-    // OrderList: {
-    //   screen: createStackNavigator(
-    //     {Root: OrderDetailStack},
-    //     {defaultNavigationOptions},
-    //   ),
-    // },
-    // CargoSmart: {
-    //   screen: createStackNavigator(
-    //     {Root: CargoSmartScreen},
-    //     {defaultNavigationOptions},
-    //   ),
-    // },
-    // Token: {
-    //   screen: TokenScreen,
-    // },
-    // CargoStart: {
-    //   screen: StartScreen,
-    // },
   },
   {
     contentComponent: DrawerContent,
