@@ -21,7 +21,6 @@ import ArrivalScreen from './screens/Arrival';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 
 const defaultNavigationOptions = ({navigation}) => {
-  console.log('defaultNavigationOptinos', navigation.state.routeName);
   return {
     headerTitle: (
       <View style={{alignContent: 'center'}}>

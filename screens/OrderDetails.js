@@ -147,7 +147,7 @@ export default class CargoDetails extends React.Component {
         // AsyncStorage.setItem(json.userID, JSON.stringify(session));
         // AsyncStorage.getItem(json.userID, (err, result) => {
         // });
-        this.props.navigation.replace('Main');
+        this.props.navigation.navigate('Main');
       } else {
         alert('Plz Check Your ID & PW');
       }

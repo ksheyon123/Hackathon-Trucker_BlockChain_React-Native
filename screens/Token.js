@@ -22,7 +22,9 @@ export default class Toekn extends React.Component {
             />
           </View>
         </View>
-        <Text style={styles.greet_font}>오현준 기사님, 수고하셨습니다.</Text>
+        <Text style={styles.greet_font}>
+          {this.state.data.params.name} 기사님, 수고하셨습니다.
+        </Text>
 
         <View style={styles.bottom}>
           <View style={styles.bottom_button}>
@@ -39,7 +41,7 @@ export default class Toekn extends React.Component {
             </Text>
           </View>
         </View>
-        <Text style={styles.token_font}>152,000TRC</Text>
+        <Text style={styles.token_font}>{this.state.data.params.token}</Text>
         <Text style={styles.tokenchg_font}>환전 가능합니다.</Text>
         <TextInput
           style={styles.data_input}
@@ -52,7 +54,9 @@ export default class Toekn extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = {phonenumber: '', password: ''};
+    let data = this.props.navigation.state;
+    this.state = {data};
+    console.log('token props', this.state);
   }
 
   componentDidMount() {

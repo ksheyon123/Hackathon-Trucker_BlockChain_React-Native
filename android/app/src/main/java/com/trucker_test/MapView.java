@@ -70,7 +70,7 @@ public class MapView extends TMapView {
         /* 현재주소 마커 */
         TMapPoint tMapPointC = new TMapPoint(orderList.getMap(0).getDouble("currentLat"), orderList.getMap(0).getDouble("currentLong"));
         TMapMarkerItem markerItemC = new TMapMarkerItem();
-        Bitmap bitmapC = BitmapFactory.decodeResource(getResources(), R.drawable.pin_r_m_a);
+        Bitmap bitmapC = BitmapFactory.decodeResource(getResources(), R.drawable.pin_r_m_c);
         markerItemC.setIcon(bitmapC);
         markerItemC.setPosition(0.5f, 1.0f); // 마커의 중심점을 중앙, 하단으로 설정
         markerItemC.setTMapPoint( tMapPointC ); // 마커의 좌표 지정
@@ -82,22 +82,19 @@ public class MapView extends TMapView {
         /* 상차지 주소 마커 */
         TMapPoint tMapPointU = new TMapPoint(orderList.getMap(0).getDouble("upLat"), orderList.getMap(0).getDouble("upLong"));
         TMapMarkerItem markerItemU = new TMapMarkerItem();
-        Bitmap bitmapU = BitmapFactory.decodeResource(getResources(), R.drawable.pin_r_m_a);
+        Bitmap bitmapU = BitmapFactory.decodeResource(getResources(), R.drawable.pin_r_m_u);
         markerItemU.setIcon(bitmapU);
         markerItemU.setPosition(0.5f, 1.0f); // 마커의 중심점을 중앙, 하단으로 설정
         markerItemU.setTMapPoint( tMapPointU ); // 마커의 좌표 지정
         markerItemU.setName("orderUp"); // 마커의 타이틀 지정
-        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.pin_r_m_a);     //오른쪽 이미지 사용
-	    markerItemU.setCalloutRightButtonImage(bitmap); 
         markerItemU.setCalloutTitle(orderList.getMap(0).getString("upAddr"));//풍선뷰에 표시될 메세지
         markerItemU.setCanShowCallout(true); //풍선뷰 사용
-        markerItemU.setCalloutSubTitle("Hello. LBC World!"); 
         this.addMarkerItem("orderUp", markerItemU); // 지도에 마커 추가
 
         /* 하차지 주소 마커 */
-        TMapPoint tMapPointD = new TMapPoint(orderList.getMap(0).getDouble("downLong"), orderList.getMap(0).getDouble("downLat"));
+        TMapPoint tMapPointD = new TMapPoint(orderList.getMap(0).getDouble("downLat"), orderList.getMap(0).getDouble("downLong"));
         TMapMarkerItem markerItemD = new TMapMarkerItem();
-        Bitmap bitmapD = BitmapFactory.decodeResource(getResources(), R.drawable.pin_r_m_a);
+        Bitmap bitmapD = BitmapFactory.decodeResource(getResources(), R.drawable.pin_r_m_d);
         markerItemD.setIcon(bitmapD);
         markerItemD.setPosition(0.5f, 1.0f); // 마커의 중심점을 중앙, 하단으로 설정
         markerItemD.setTMapPoint( tMapPointD ); // 마커의 좌표 지정

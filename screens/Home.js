@@ -76,7 +76,6 @@ export default class Home extends React.Component {
 
   login = async () => {
     try {
-      console.log('hi');
       const response = await fetch('http://localhost:3000/login', {
         method: 'POST',
         headers: {

@@ -267,7 +267,7 @@ export default class Toekn extends React.Component {
       });
       let json = await response.json();
       if (response.ok) {
-        this.props.navigation.navigate('MainDisplay');
+        this.props.navigation.replace('MainDisplay');
       }
     } catch (err) {
       console.log(err);

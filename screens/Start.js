@@ -146,15 +146,15 @@ export default class Toekn extends React.Component {
     );
   }
 
-  // constructor(props) {
-  //   super(props);
-  //   let data = props.navigation.state;
+  constructor(props) {
+    super(props);
+    let data = props.navigation.state;
 
-  //   this.state = {
-  //     data: data,
-  //   };
-  //   console.log('data?', this.state);
-  // }
+    this.state = {
+      gdata: data,
+    };
+    console.log('gdata', this.state.gdata.params.geodata);
+  }
 
   signatureJsx() {
     if (this.state.ctosDistance < 3) {
@@ -210,7 +210,7 @@ export default class Toekn extends React.Component {
 
       let gcs = await this._getGeoCodingStart(spoint);
       let gce = await this._getGeoCodingEnd(epoint);
-
+      this.setState({gcscoords: gcs, gcecoords: gce});
       let gcsaddr = await this._currentToStartTrace(
         this.props.navigation.getParam('geodata').longitude,
         this.props.navigation.getParam('geodata').latitude,
@@ -360,7 +360,13 @@ export default class Toekn extends React.Component {
       let json = await response.json();
       if (response.ok) {
         this.props.navigation.navigate('Navigation', {
-          data: this.state,
+          gcs: this.state.gcscoords,
+          gce: this.state.gcecoords,
+          gdata: this.state.gdata.params.geodata,
+          startpoint: this.state.startpoint,
+          endpoint: this.state.endpoint,
+          pdata: this.props.navigation.getParam('gpsdata'),
+          gpsdata: this.props.navigation.getParam('gpsdata'),
         });
       }
     } catch (err) {

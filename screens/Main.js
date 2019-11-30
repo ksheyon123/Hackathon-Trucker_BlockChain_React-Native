@@ -6,13 +6,13 @@ import {
   TouchableOpacity,
   StyleSheet,
   Image,
+  Button,
 } from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
 
 export default class Main extends React.Component {
   render() {
     const navigation = this.props.navigation;
-
     return (
       <View style={styles.container}>
         <View style={styles.top_container}>
@@ -24,14 +24,13 @@ export default class Main extends React.Component {
             <Text style={styles.info_3_font}>보유하고 계십니다</Text>
           </View>
           <View style={styles.top_image}>
-            <Text>이미지 있니?</Text>
+            <Image source={require('../public/images/profile_1.png')} />
           </View>
         </View>
 
         <View style={styles.bottom_container}>
           <View style={styles.bottom_top}>
             {this.displayJsx()}
-
             <View style={styles.smart}>
               <TouchableOpacity
                 onPress={() =>
@@ -49,7 +48,14 @@ export default class Main extends React.Component {
           <View style={styles.bottom_bottom}>
             <View style={styles.token}>
               <TouchableOpacity
-                onPress={() => this.props.navigation.navigate('Token')}
+                onPress={() =>
+                  this.props.navigation.navigate('Token', {
+                    gpsdata: navigation.getParam('gpsdata'),
+                    geodata: navigation.getParam('geodata'),
+                    token: this.state.userBalance,
+                    name: this.state.userNM,
+                  })
+                }
                 style={styles.buttonContainer}>
                 <Image source={require('../public/images/button3.png')} />
               </TouchableOpacity>
@@ -225,6 +231,7 @@ export default class Main extends React.Component {
         navigation.setParams({
           gpsdata: json.addressInfo.fullAddress,
         });
+        console.log(this.state.fullAddr);
       }
     } catch (err) {
       console.log(err);
